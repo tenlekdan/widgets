@@ -1,0 +1,25 @@
+.btn-grp {
+    a {
+        color: #000;
+
+        svg {
+            height: 35px;
+            path {
+                fill: #fff;
+                stroke-width: 5px;
+                stroke:#000;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+        
+    }
+
+    a.rated {
+        svg path{
+            fill: #eb8f1d;
+            
+        }
+    }
+}

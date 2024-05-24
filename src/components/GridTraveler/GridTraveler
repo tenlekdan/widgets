@@ -1,0 +1,21 @@
+const gridTraveler = (m, n) => {
+    if (m === 1 && n === 1) return 1;
+    if (m === 0 || n === 0) return 0;
+
+    return gridTraveler(m - 1, n) + gridTraveler(m, n - 1);
+
+}
+
+//memoizatoin of grid travler
+
+const gridTravlerM = (m, n, memo = {}) => {
+
+    const key = m + ',' + n;
+    if (memo[key]) return memo[key]
+
+    if (m === 1 && n === 1) return 1;
+    if (m === 0 || n === 0) return 0;
+
+    memo[key] = gridTravlerM(m - 1, n, memo) + gridTravlerM(m, n - 1, memo);
+    return memo[key];
+} 
