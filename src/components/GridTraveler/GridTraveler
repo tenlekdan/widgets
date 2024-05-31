@@ -19,3 +19,51 @@ const gridTravlerM = (m, n, memo = {}) => {
     memo[key] = gridTravlerM(m - 1, n, memo) + gridTravlerM(m, n - 1, memo);
     return memo[key];
 } 
+
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {string}
+ */
+var minWindow = function (s, t) {
+    //create map of char count in t
+    let tmap = new Map();
+    for (let i of t) {
+        tmap.set(i, (tmap.get(i) || 0) + 1);
+    }
+
+    //logic to define substr exist.
+    let tsize = tmap.size;
+    let commonCount = 0;
+    let smap = new Map();
+    let [l, r] = [0, 0]
+    let windowIndexSize = [0, Infinity]
+    while (r < s.length) {
+        let c = s.charAt(r);
+        smap.set(c, (smap.get(c) + 1) || 0);
+
+        if (tmap.has(c) && tmap.get(c) === smap.get(c)) {
+            commonCount++;
+        }
+
+        while (commonCount === tsize) {
+
+            //minimize
+            if ((r - l) < (windowIndexSize[1] - windowIndexSize[0]))
+                windowIndexSize = [l, r];
+
+            smap.set(smap.get(s[l]), smap.get(s[l]) - 1);
+            //shrink
+            if (smap.get(l) < tmap.get(l)) {
+                commonCount--
+            }
+            l++;
+        }
+        r++;
+    }
+
+    const result = windowIndexSize[1] === Infinity ? '' : s.substring(...windowIndexSize);
+    console.log(result);
+    return result;
+};
+

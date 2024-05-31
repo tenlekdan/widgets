@@ -1,0 +1,18 @@
+.region-container {
+    position: relative;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    width: 90vw;
+    justify-content: center;
+}
+
+button {
+    display: block;
+    margin-left: 10px;
+}
+
+.selected-value{
+    margin-left: 10px;
+    display: inline-block;
+}
