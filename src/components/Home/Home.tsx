@@ -1,4 +1,5 @@
 import ContextStore from "../ContextStore";
+import Modal from "../Modal/Base";
 import Region from "../Region/Region";
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
             <ContextStore>
                <Region></Region>
             </ContextStore>
+            <Modal></Modal>
         </>
     )
 }

@@ -1,73 +1,89 @@
-import { createContext, useEffect, useReducer, useState } from "react";
+import { ReactNode, createContext, useEffect, useReducer } from "react";
 
-
-export const RegionContext = createContext({
-    regionObj: { inputRegion: '', selectedRegion: '' },
-    regionList: [''],
-    handleSelectRegion: (region: string) => { },
-    regionInputChange: (event: any) => { },
-    filterRegion: () => []
-})
-
-function regionObjReducer(state: any, action: { type: string, payload: {} }) {
-    if (action.type === 'UPDATE_INPUT') {
-        return {
-            ...state,
-            inputRegion: action.payload,
-        }
-    } else if (action.type === 'SELECT_REGION') {
-        return {
-            inputRegion: action.payload,
-            selectedRegion: action.payload
-        }
-    }
-    return state
+// Define Types
+interface RegionObjState {
+    inputRegion: string;
+    selectedRegion: string;
+}
+interface RegionContextType {
+    regionObj: RegionObjState;
+    regionList: string[];
+    handleSelectRegion: (region: string) => void;
+    regionInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    filterRegion: () => string[] | null;
 }
 
-function regionListReducer(state: any, action: { type: string, payload: [] }) {
-    if (action.type === 'SET_REGIONLIST') {
-        return [
-            ...action.payload
-        ]
+// Initial state values
+const initalRegionObjState: { inputRegion: string; selectedRegion: string } = {
+    inputRegion: "",
+    selectedRegion: "",
+};
+const initialRegionListState: string[] = [];
+
+// Create region context object
+export const RegionContext = createContext<RegionContextType>({
+    regionObj: { inputRegion: "", selectedRegion: "" },
+    regionList: [""],
+    handleSelectRegion: () => { },
+    regionInputChange: () => { },
+    filterRegion: () => [],
+});
+
+// Reducers
+function regionObjReducer(state: RegionObjState, 
+    action: { type: string; payload: string }): RegionObjState {
+    if (action.type === "UPDATE_INPUT") {
+        return {...state, inputRegion: action.payload,};
+    } else if (action.type === "SELECT_REGION") {
+        return {inputRegion: action.payload,selectedRegion: action.payload};
     }
+    return state;
 }
-const initalRegionObjState = { inputRegion: '', selectedRegion: '' };
-export default function ContextStore({ children }: { children: any }) {
-    const [regionObj, regionObjDispatch] = useReducer(regionObjReducer, initalRegionObjState)
-    const [regionList, regionListDispatch] = useReducer(regionListReducer, []);
+function regionListReducer(state: string[],
+    action: { type: string; payload: string[] }): string[] {
+    if (action.type === "SET_REGIONLIST") {
+        return [...action.payload];
+    }
+    return state;
+}
+
+export default function ContextStore({ children }: { children: ReactNode }) {
+    const [regionObj, regionObjDispatch] = useReducer(
+        regionObjReducer,
+        initalRegionObjState
+    );
+    const [regionList, regionListDispatch] = useReducer(
+        regionListReducer,
+        initialRegionListState
+    );
     useEffect(() => {
-        fetch('http://localhost:5173/public/countries.json')
-            .then(((res: Response) => {
-                if (res.status) {
+        fetch("http://localhost:5173/public/countries.json")
+            .then((res: Response) => {
+                if (res.ok) {
                     return res.json();
                 }
-            })).then((data) => {
-                regionListDispatch({
-                    type: 'SET_REGIONLIST',
-                    payload: data
-                })
+                throw new Error('Network issue')
             })
-    }, [])
+            .then((data) => {
+                regionListDispatch({
+                    type: "SET_REGIONLIST",
+                    payload: data,
+                });
+            });
+    }, []);
 
     function regionInputChange(event: any) {
         regionObjDispatch({
-            type: 'UPDATE_INPUT',
-            payload: event.target.value
-        })
-    }
-
-    function handleRegionSelect(region: string) {
-        regionObjDispatch({
-            type: 'UPDATE_INPUT',
-            payload: region
-        })
+            type: "UPDATE_INPUT",
+            payload: event.target.value,
+        });
     }
 
     function handleSelectRegion(selectedRegion: string) {
         regionObjDispatch({
-            type: 'SELECT_REGION',
-            payload: selectedRegion
-        })
+            type: "SELECT_REGION",
+            payload: selectedRegion,
+        });
     }
 
     function filterRegion(): Array<string> | null {
@@ -82,10 +98,10 @@ export default function ContextStore({ children }: { children: any }) {
         regionObj,
         regionList,
         handleSelectRegion,
-        regionInputChange: regionInputChange,
-        filterRegion
-    }
-    return <RegionContext.Provider value={context}>
-        {children}
-    </RegionContext.Provider>
+        regionInputChange,
+        filterRegion,
+    };
+    return (
+        <RegionContext.Provider value={context}>{children}</RegionContext.Provider>
+    );
 }
